@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Analyzer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="container">
+        <h1 style="cursor: default;">Password Analyzer</h1>
+
+        <label for="password">Enter your password:</label>
+        <div class="password-container">
+            <input type="password" id="password" placeholder="Enter password" oninput="analyzePassword()">
+            <div class="show" onclick="show()">show</div>
+        </div>
+        <div id="strengthIndicator"></div>
+        <ul id="feedback"></ul>
+
+    </div>
+
+    <script>
+        function analyzePassword() {
+            const password = document.getElementById('password').value;
+            const feedback = document.getElementById('feedback');
+            const strengthIndicator = document.getElementById('strengthIndicator');
+
+            feedback.innerHTML = "";
+            let strength = 0;
+            let messages = [];
+
+            if (password.length >= 12) {
+                strength += 1;
+            } else {
+                messages.push("Password should be at least 12 characters long.");
+            }
+
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+            if (hasUppercase && hasLowercase && hasNumber && hasSpecial) {
+                strength += 2;
+            } else {
+                if (!hasUppercase) messages.push("Add at least one uppercase letter.");
+                if (!hasLowercase) messages.push("Add at least one lowercase letter.");
+                if (!hasNumber) messages.push("Add at least one number.");
+                if (!hasSpecial) messages.push("Add at least one special character.");
+            }
+
+            const commonPasswords = ["123456", "password", "123456789", "qwerty", "abc123"];
+            if (commonPasswords.includes(password)) {
+                messages.push("Avoid common passwords like '123456' or 'password'.");
+            }
+
+            if (/(\w)\1\1/.test(password)) {
+                messages.push("Avoid repeating characters.");
+            }
+
+            switch (strength) {
+                case 3:
+                    strengthIndicator.style.backgroundColor = 'green';
+                    break;
+                case 2:
+                    strengthIndicator.style.backgroundColor = 'orange';
+                    break;
+                default:
+                    strengthIndicator.style.backgroundColor = 'red';
+                    break;
+            }
+
+            messages.forEach(msg => {
+                const listItem = document.createElement('li');
+                listItem.textContent = msg;
+                feedback.appendChild(listItem);
+            });
+        }
+
+        function show() {
+            const passwordField = document.getElementById('password');
+            const toggleIcon = document.querySelector('.show');
+
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                toggleIcon.innerHTML = "hide";
+            } else {
+                passwordField.type = "password";
+                toggleIcon.innerHTML = "show";
+            }
+        }
+    </script>
+
+</body>
+
+</html>
